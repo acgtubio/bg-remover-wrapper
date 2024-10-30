@@ -15,7 +15,7 @@ def process_images(input_folder, output_folder):
 
     # Loop through each file in the input folder
     for filename in os.listdir(input_folder):
-        input_path = os.path.join(input_folder, filename)  # Construct the full path to the input file
+        input_path = os.path.join(input_folder, filename) # Construct the full path to the input file
         
         # Process only if the file is an image (by checking its extension)
         if os.path.isfile(input_path) and filename.lower().endswith(('.png', '.jpg', '.jpeg')):
