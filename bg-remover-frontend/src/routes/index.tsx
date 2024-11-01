@@ -1,3 +1,6 @@
+import FileUpload from "~/components/upload/file-upload";
+import { FileCollectionProvider } from "~/store/provider";
+
 export default function Home() {
   return (
     <main class="text-center mx-auto p-4 flex flex-col justify-center h-lvh items-center">
@@ -6,6 +9,10 @@ export default function Home() {
 
       <section class="h-2/3 border rounded-lg mt-20 p-20 max-w-7xl w-full">
         <h1 class="text-4xl font-bold">UPLOAD FILE</h1>
+
+        <FileCollectionProvider>
+          <FileUpload />
+        </FileCollectionProvider>
       </section>
     </main>
   );
