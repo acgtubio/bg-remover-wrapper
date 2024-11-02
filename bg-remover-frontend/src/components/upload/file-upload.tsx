@@ -1,4 +1,4 @@
-import { Component, createSignal, useContext } from "solid-js";
+import { Component, Show, createSignal, useContext } from "solid-js";
 import { FileCollectionContext } from "~/store/provider";
 
 const FileUpload: Component = () => {
@@ -8,15 +8,32 @@ const FileUpload: Component = () => {
 
 	// TODO: eyd - type
 	const handleFileChange = (e: any) => {
-		console.info("suck my balls");
 		setFile(e.target.files[0]);
+	}
+
+	const handleRemoveFile = () => {
+		setFile(undefined);
 	}
 
 	return (
 		<div>
 			<div ref={progressBarRef}></div>
 			<form>
-				<input type="file" name="file" onChange={handleFileChange} />
+				<div class="flex flex-col justify-center items-center">
+					<Show
+						when={file() !== undefined}
+						fallback={
+							<label for="file-upload" class="cursor-pointer px-10 py-5 border rounded-lg">Upload File</label>
+						}
+					>
+						<div class="flex items-center">
+							<span class="mr-4">{file()?.name}</span>
+							<i class="fa-solid fa-rectangle-xmark cursor-pointer" onClick={handleRemoveFile}></i>
+						</div>
+					</Show>
+
+					<input id="file-upload" type="file" name="file" onChange={handleFileChange} class="hidden" />
+				</div>
 			</form>
 		</div>
 	);
