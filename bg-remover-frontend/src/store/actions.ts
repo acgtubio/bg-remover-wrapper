@@ -1,4 +1,8 @@
 export type ADD_FILE = "ADD_FILE";
+export type SUBMIT_FILES = "SUBMIT_FILES";
+export type DELETE_FILE = "DELETE_FILE";
 
 export type FILE_ACTIONS =
-	ADD_FILE;
+	ADD_FILE |
+	SUBMIT_FILES |
+	DELETE_FILE;

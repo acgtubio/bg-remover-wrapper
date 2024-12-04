@@ -1,3 +1,4 @@
+import { FILE_ACTIONS } from "~/store/actions";
 
 export type FileStore = {
 	files: File[],
@@ -5,5 +6,7 @@ export type FileStore = {
 
 export type FileStoreContext = {
 	fileStore: FileStore,
-	dispatcher: (action: string) => void,
+	dispatch: (action: FILE_ACTIONS, payload: StorePayload) => void,
 }
+
+export type StorePayload = File | File[] | number;
