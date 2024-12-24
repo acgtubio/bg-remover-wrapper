@@ -30,6 +30,32 @@ const FileUpload: Component = () => {
 		response.clear();
 	}
 
+	const handleDownload = (image: string): void => {
+		const byteString = atob(image);
+		const arrayBuffer = new ArrayBuffer(byteString.length);
+		const uint8Array = new Uint8Array(arrayBuffer);
+
+		for (let i = 0; i < byteString.length; i++) {
+			uint8Array[i] = byteString.charCodeAt(i);
+		}
+
+		const blob = new Blob([uint8Array], { type: "image/png" });
+		const url = URL.createObjectURL(blob);
+
+		// Temporary element
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = 'image.png'; // Specify the downloaded file name
+		document.body.appendChild(link);
+
+		// Trigger the download
+		link.click();
+
+		// Clean up
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	}
+
 	return (
 		<div>
 			<div ref={progressBarRef}></div>
@@ -49,10 +75,12 @@ const FileUpload: Component = () => {
 							)}
 						</For>
 
-						<input id="file-upload" type="file" name="file" onChange={handleFileChange} class="hidden" />
+						<input id="file-upload" type="file" name="file" onChange={handleFileChange} class="hidden" accept="image/*" />
 					</div>
 
-					<button type="submit">Submit</button>
+					<Show when={fileStore.files.length > 0 && !response.pending && !response.result}>
+						<button type="submit" class="cursor-pointer px-10 py-5 border rounded-lg mt-10">Submit</button>
+					</Show>
 				</form>
 			</Show>
 
@@ -64,6 +92,7 @@ const FileUpload: Component = () => {
 							{(image, i) => (
 								<div>
 									<img id={"image" + i} src={"data:image/png;base64," + image} />
+									<button onClick={() => handleDownload(image)}>Download</button>
 								</div>
 							)}
 						</For>

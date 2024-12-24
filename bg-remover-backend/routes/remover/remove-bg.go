@@ -5,10 +5,12 @@ import (
 	"encoding/base64"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -34,6 +36,11 @@ func HandleRemoveBackground(c echo.Context) error {
 
 		if err != nil {
 			return err
+		}
+
+		if !isImage(src) {
+			log.Println(file.Filename + "is not an image, skipping.")
+			continue
 		}
 
 		defer src.Close()
@@ -100,4 +107,25 @@ func HandleRemoveBackground(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"images": images,
 	})
+}
+func isImage(file multipart.File) bool {
+	// Read the first 512 bytes of the file to determine its content type
+	buffer := make([]byte, 512)
+	_, err := file.Read(buffer)
+	if err != nil {
+		log.Println("Error reading file:", err)
+		return false
+	}
+
+	// Reset file pointer after reading
+	if _, err := file.Seek(0, 0); err != nil {
+		log.Println("Error resetting file pointer:", err)
+		return false
+	}
+
+	// Detect the content type of the file
+	contentType := http.DetectContentType(buffer)
+
+	// Check if the content type starts with "image/"
+	return strings.HasPrefix(contentType, "image/")
 }
