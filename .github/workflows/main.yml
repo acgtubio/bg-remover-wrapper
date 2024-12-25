@@ -113,7 +113,7 @@ jobs:
       - name: Download binary artifact
         uses: actions/download-artifact@v3
         with:
-          name: main-binary
+          name: fe-folder
           path: ./bg-remover-frontend/
 
       - name: Copy-Build-Golang-App
