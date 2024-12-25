@@ -72,4 +72,6 @@ jobs:
           port: 22
           script: |
             cd ${{ secrets.APP_DIR }}
+            cd ./bg-remover-backend
+            chmod +x main
             ls -al
