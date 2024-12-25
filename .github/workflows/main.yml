@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: fe-folder
-          path: ./bg-remover-frontend/.output/
+          path: ./bg-remover-frontend/.output
         
   # Deploy Job
   production-be:
