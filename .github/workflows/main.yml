@@ -44,6 +44,7 @@ jobs:
 
       - name: Setup Dependencies
         run: |
+          cd ./bg-remover-frontend/
           bun install
           bun run build
 
