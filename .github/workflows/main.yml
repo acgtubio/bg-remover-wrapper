@@ -1,0 +1,141 @@
+name: CI/CD for Background Remover
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # Build Job
+  build-be:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+          
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.3'
+
+      - name: Install dependencies
+        run: |
+          cd ./bg-remover-backend/
+          go mod tidy
+      - name: Build App
+        run: |
+          cd ./bg-remover-backend/
+          make build
+
+      - name: Upload binary as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: main-binary
+          path: ./bg-remover-backend/main
+
+  build-fe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Dependencies
+        run: |
+          cd ./bg-remover-frontend/
+          bun install
+          bun run build
+          
+      - name: Upload as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: fe-folder
+          include-hidden-files: true
+          path: ./bg-remover-frontend/.output
+        
+  # Deploy Job
+  production-be:
+   
+    needs: build-be
+    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          token: ${{ secrets.PAT }}
+
+      - name: Download binary artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: main-binary
+          path: ./bg-remover-backend/
+
+      - name: Copy-Build-Golang-App
+        uses: appleboy/scp-action@master
+        with:
+          host: '${{ secrets.VPS_IP }}'
+          username: '${{ secrets.UNAME }}'
+          key: '${{ secrets.PRIV_KEY }}'
+          port: '${{ secrets.VPS_PORT }}'
+          source: ./bg-remover-backend/main
+          target: '${{ secrets.APP_DIR }}'
+          
+      - name: Set up SSH Key and Deploy my App on Server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.UNAME }}
+          key: ${{ secrets.PRIV_KEY }}
+          passphrase: ''
+          port: 22
+          script: |
+            cd ${{ secrets.APP_DIR }}
+            cd ./bg-remover-backend
+            chmod +x main
+            sudo systemctl restart ${{ secrets.SERVICE }}
+
+  # Deploy Job
+  production-fe:
+    needs: build-fe
+  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          token: ${{ secrets.PAT }}
+
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: fe-folder
+          path: ./bg-remover-frontend/.output/
+
+      - name: Copy FE
+        uses: appleboy/scp-action@master
+        with:
+          host: '${{ secrets.VPS_IP }}'
+          username: '${{ secrets.UNAME }}'
+          key: '${{ secrets.PRIV_KEY }}'
+          port: '${{ secrets.VPS_PORT }}'
+          source: ./bg-remover-frontend/
+          target: '${{ secrets.APP_DIR }}'
+          
+      - name: Set up SSH Key and Deploy my App on Server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.UNAME }}
+          key: ${{ secrets.PRIV_KEY }}
+          passphrase: ''
+          port: 22
+          script: |
+            cd ${{ secrets.APP_DIR }}
+            cd ./bg-remover-frontend
+            ${{ secrets.BUN }} install
+            sudo systemctl restart ${{ secrets.FE_SERVICE }}
