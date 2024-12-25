@@ -53,7 +53,7 @@ jobs:
         with:
           name: fe-folder
           include-hidden-files: true
-          path: ./bg-remover-frontend/.output/
+          path: ./bg-remover-frontend/.output
         
   # Deploy Job
   production-be:
