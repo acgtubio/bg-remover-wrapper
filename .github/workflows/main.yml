@@ -43,6 +43,8 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Setup Dependencies
+        env: 
+          VITE_API_URL: ${{ secrets.API_URL }}
         run: |
           cd ./bg-remover-frontend/
           bun install
