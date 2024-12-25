@@ -107,6 +107,6 @@ jobs:
           script: |
             cd ${{ secrets.APP_DIR }}
             cd ./bg-remover-frontend
-            bun install
-            bun run build
+            ${{ secrets.BUN }} install
+            ${{ secrets.BUN }} run build
             sudo systemctl restart ${{ secrets.FE_SERVICE }}
