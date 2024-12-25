@@ -123,7 +123,7 @@ jobs:
           username: '${{ secrets.UNAME }}'
           key: '${{ secrets.PRIV_KEY }}'
           port: '${{ secrets.VPS_PORT }}'
-          source: ./bg-remover-frontend/
+          source: ./bg-remover-frontend/.output/
           target: '${{ secrets.APP_DIR }}'
           
       - name: Set up SSH Key and Deploy my App on Server
@@ -135,7 +135,4 @@ jobs:
           passphrase: ''
           port: 22
           script: |
-            cd ${{ secrets.APP_DIR }}
-            cd ./bg-remover-frontend
-            ${{ secrets.BUN }} install
             sudo systemctl restart ${{ secrets.FE_SERVICE }}
