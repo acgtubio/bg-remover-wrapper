@@ -78,9 +78,6 @@ jobs:
 
   # Deploy Job
   production-fe:
-   
-    needs: build-fe
-    
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -89,7 +86,7 @@ jobs:
           ref: main
           token: ${{ secrets.PAT }}
 
-      - name: Copy-Build-Golang-App
+      - name: Copy FE
         uses: appleboy/scp-action@master
         with:
           host: '${{ secrets.VPS_IP }}'
