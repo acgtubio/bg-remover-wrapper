@@ -114,7 +114,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: fe-folder
-          path: ./bg-remover-frontend/
+          path: ./bg-remover-frontend/.output/
 
       - name: Copy FE
         uses: appleboy/scp-action@master
