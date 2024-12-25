@@ -47,14 +47,13 @@ jobs:
           cd ./bg-remover-frontend/
           bun install
           bun run build
-          rm -rf ./node_modules
-          ls -al
-
+          
       - name: Upload as artifact
         uses: actions/upload-artifact@v3
         with:
           name: fe-folder
-          path: ./bg-remover-frontend/
+          include-hidden-files: true
+          path: ./bg-remover-frontend/.output/
         
   # Deploy Job
   production-be:
@@ -115,7 +114,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: fe-folder
-          path: ./bg-remover-frontend/t/
+          path: ./bg-remover-frontend/
 
       - name: Copy FE
         uses: appleboy/scp-action@master
