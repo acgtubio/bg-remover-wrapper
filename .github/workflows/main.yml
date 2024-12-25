@@ -7,7 +7,7 @@ on:
 
 jobs:
   # Build Job
-  build:
+  build-be:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -32,11 +32,31 @@ jobs:
         with:
           name: main-binary
           path: ./bg-remover-backend/main
-      
+          
+  build-fe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Dependencies
+        run: |
+          bun install
+          bun run build
+
+      - name: Upload as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: fe-folder
+          path: ./bg-remover-frontend/
+        
   # Deploy Job
-  production:
+  production-be:
    
-    needs: build
+    needs: build-be
     
     runs-on: ubuntu-latest
     steps:
@@ -75,3 +95,45 @@ jobs:
             cd ./bg-remover-backend
             chmod +x main
             systemctl restart ${{ secrets.SERVICE }}
+
+  # Deploy Job
+  production-fe:
+   
+    needs: build-fe
+    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          token: ${{ secrets.PAT }}
+
+      - name: Download binary artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: main-binary
+          path: ./bg-remover-frontend/
+
+      - name: Copy-Build-Golang-App
+        uses: appleboy/scp-action@master
+        with:
+          host: '${{ secrets.VPS_IP }}'
+          username: '${{ secrets.UNAME }}'
+          key: '${{ secrets.PRIV_KEY }}'
+          port: '${{ secrets.VPS_PORT }}'
+          source: ./bg-remover-frontend/
+          target: '${{ secrets.APP_DIR }}'
+          
+      - name: Set up SSH Key and Deploy my App on Server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.UNAME }}
+          key: ${{ secrets.PRIV_KEY }}
+          passphrase: ''
+          port: 22
+          script: |
+            cd ${{ secrets.APP_DIR }}
+            cd ./bg-remover-frontend
+            systemctl restart ${{ secrets.FE_SERVICE }}
