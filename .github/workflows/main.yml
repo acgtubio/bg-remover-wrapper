@@ -47,12 +47,13 @@ jobs:
           cd ./bg-remover-frontend/
           bun install
           bun run build
+          ls -al
 
       - name: Upload as artifact
         uses: actions/upload-artifact@v3
         with:
           name: fe-folder
-          path: ./bg-remover-frontend/.output
+          path: ./bg-remover-frontend/.output/
         
   # Deploy Job
   production-be:
