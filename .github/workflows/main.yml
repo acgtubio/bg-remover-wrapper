@@ -94,7 +94,7 @@ jobs:
             cd ${{ secrets.APP_DIR }}
             cd ./bg-remover-backend
             chmod +x main
-            systemctl restart ${{ secrets.SERVICE }}
+            sudo systemctl restart ${{ secrets.SERVICE }}
 
   # Deploy Job
   production-fe:
@@ -136,4 +136,4 @@ jobs:
           script: |
             cd ${{ secrets.APP_DIR }}
             cd ./bg-remover-frontend
-            systemctl restart ${{ secrets.FE_SERVICE }}
+            sudo systemctl restart ${{ secrets.FE_SERVICE }}
