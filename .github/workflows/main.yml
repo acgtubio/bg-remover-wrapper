@@ -74,4 +74,4 @@ jobs:
             cd ${{ secrets.APP_DIR }}
             cd ./bg-remover-backend
             chmod +x main
-            ls -al
+            systemctl restart ${{ secrets.SERVICE }}
