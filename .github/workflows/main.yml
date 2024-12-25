@@ -32,6 +32,27 @@ jobs:
         with:
           name: main-binary
           path: ./bg-remover-backend/main
+
+  build-fe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Dependencies
+        run: |
+          cd ./bg-remover-frontend/
+          bun install
+          bun run build
+
+      - name: Upload as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: fe-folder
+          path: ./bg-remover-frontend/.output/
         
   # Deploy Job
   production-be:
@@ -86,6 +107,12 @@ jobs:
           ref: main
           token: ${{ secrets.PAT }}
 
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: fe-folder
+          path: ./bg-remover-frontend/
+
       - name: Copy FE
         uses: appleboy/scp-action@master
         with:
@@ -108,5 +135,4 @@ jobs:
             cd ${{ secrets.APP_DIR }}
             cd ./bg-remover-frontend
             ${{ secrets.BUN }} install
-            ${{ secrets.BUN }} run build
             sudo systemctl restart ${{ secrets.FE_SERVICE }}
