@@ -99,6 +99,8 @@ jobs:
 
   # Deploy Job
   production-fe:
+    needs: build-fe
+  
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
