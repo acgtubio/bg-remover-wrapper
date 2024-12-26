@@ -24,6 +24,7 @@ type File2Process struct {
 func HandleRemoveBackground(c echo.Context) error {
 	python_dir := os.Getenv("PYTHON_DIR")
 	img_dir := os.Getenv("IMG_DIR")
+	python_exec := os.Getenv("PYTHON_EXEC")
 
 	form, err := c.MultipartForm()
 
@@ -63,11 +64,14 @@ func HandleRemoveBackground(c echo.Context) error {
 		if _, err := io.Copy(dst, src); err != nil {
 			return err
 		}
+
+		log.Print("Saved file: " + file.Filename)
 	}
 
 	for _, fileName := range fileNames {
+		log.Print("Converting file: " + fileName.osFileName)
 		cmd := exec.Command(
-			"python",
+			python_exec,
 			python_dir+"/remove_bg.py",
 			img_dir+fileName.osFileName,
 		)
@@ -77,9 +81,11 @@ func HandleRemoveBackground(c echo.Context) error {
 		cmd.Stderr = &stderr
 		cmd.Stdout = &out
 		if err := cmd.Run(); err != nil {
+			log.Print("Error converting file.")
 			log.Fatal(err.Error() + ": " + stderr.String())
 			return err
 		}
+		log.Print("Done converting file: " + fileName.osFileName)
 	}
 
 	images := []string{}
