@@ -22,6 +22,9 @@ type File2Process struct {
 }
 
 func HandleRemoveBackground(c echo.Context) error {
+	python_dir := os.Getenv("PYTHON_DIR")
+	img_dir := os.Getenv("IMG_DIR")
+
 	form, err := c.MultipartForm()
 
 	if err != nil {
@@ -65,8 +68,8 @@ func HandleRemoveBackground(c echo.Context) error {
 	for _, fileName := range fileNames {
 		cmd := exec.Command(
 			"python",
-			"/Users/u025/Documents/Coding/bg-remover/remover/remove_bg.py",
-			"/Users/u025/Documents/Coding/bg-remover/bg-remover-backend/"+fileName.osFileName,
+			python_dir+"/remove_bg.py",
+			img_dir+fileName.osFileName,
 		)
 		var out bytes.Buffer
 		var stderr bytes.Buffer
@@ -81,7 +84,7 @@ func HandleRemoveBackground(c echo.Context) error {
 
 	images := []string{}
 	for _, fileName := range fileNames {
-		inputFilePath := "/Users/u025/Documents/Coding/bg-remover/bg-remover-backend/" + filepath.Base(fileName.osFileName)
+		inputFilePath := img_dir + filepath.Base(fileName.osFileName)
 		filePath := inputFilePath + "-out" + filepath.Ext(fileName.osFileName)
 
 		fileBytes, err := os.ReadFile(filePath)
